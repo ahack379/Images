@@ -9,7 +9,6 @@ from scipy import ndimage as ndi
 from skimage import feature, measure 
 
 fout=TFile.Open("temp.root","RECREATE")
-#fout=TFile.Open("ana.root","WRITE")
 
 #t = TTree("ctours","ctours")
 #con = np.zeros(5,float)
@@ -21,7 +20,6 @@ run.AddFile(sys.argv[1])
 c=TCanvas("c","",600,500)
 
 run.GetEntries()
-
 
 N_bins = 200
 
@@ -60,7 +58,7 @@ for e in run:
   images = []
   ax = []
 
-  fig, ((ax5,ax4,ax3),(ax5E,ax4E,ax3E),(ax2,ax1,ax0)) = plt.subplots(nrows=3,ncols=3) #figsize=(8,3))#,sharex=True,sharey=True)
+  fig, ((ax5,ax4,ax3),(ax5E,ax4E,ax3E),(ax2,ax1,ax0)) = plt.subplots(nrows=3,ncols=3) 
 
   ax.append(ax0)
   ax.append(ax1)
@@ -72,22 +70,13 @@ for e in run:
   ax.append(ax4E)
   ax.append(ax5E)
 
-
   for i in xrange(6):
 
     im = getImage(e,i,N_bins)
     
     edges = feature.canny(im, sigma=3)
     contours = measure.find_contours(edges, 0.8,'high')
-     
 
-#    con2.resize(len(contours))    
-#    for c in xrange(len(contours)):
-#      for l in contours[c] :
-#        print "c and ll: ", c, l[0], l[1]
-#        ugh.append(std.make_pair(l[0],l[1]))
-#      con2.push_back(ugh)
-     
     if i > 2: 
       ax[i].imshow(im, cmap=plt.cm.winter)
       ax[i+3].imshow(edges,cmap=plt.cm.gray)
@@ -98,16 +87,16 @@ for e in run:
         ax[i].plot(contour[:,1], contour[:,0],linewidth= 2)
       ax[i].axis('image')
 
-
-    if i is 2:
-      for c in contours[1]:
-	temp = c
-        temp[0] *= (e.x_max[i] + 50 - e.x_min[i] + 50 )/N_bins
-	temp[0] += e.x_min[i] - 50
-
-        temp[1] *= (e.y_max[i] - e.y_min[i] + 100)/N_bins
-	temp[1] += e.y_min[i] - 50 
-	print temp
+#    convert back to wire, time coordinates
+#    if i is 2:
+#      for c in contours[1]:
+#	temp = c
+#        temp[0] *= (e.x_max[i] + 50 - e.x_min[i] + 50 )/N_bins
+#	temp[0] += e.x_min[i] - 50
+#
+#        temp[1] *= (e.y_max[i] - e.y_min[i] + 100)/N_bins
+#	temp[1] += e.y_min[i] - 50 
+#	print temp
     
 
   fig.subplots_adjust(wspace=0.02, hspace=0.02, top=0.9,
@@ -118,5 +107,3 @@ for e in run:
   break
 
 plt.show()
-#fout.Close()
-
