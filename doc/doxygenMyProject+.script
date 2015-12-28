@@ -4,7 +4,6 @@
 @INCLUDE = $(LARLITE_USERDEVDIR)/Images/doc/doxygenMyProject.script
 
 OUTPUT_DIRECTORY       = $(LARLITE_USERDEVDIR)/Images/doc/dOxygenMyProject+
-
 #
 # ROOT
 #
