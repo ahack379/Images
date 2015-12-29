@@ -3,6 +3,8 @@
 *Cint.h
 *Cint.cxx
 *Cint.cc
+*Dict.cxx
+*Dict.h
 .depend
 *.rootmap
 *.so
