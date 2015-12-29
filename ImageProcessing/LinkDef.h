@@ -13,7 +13,8 @@
 #pragma link C++ class larlite::checkInside+;
 
 #pragma link C++ namespace imutil+;
-#pragma link C++ class imutil::Coordinate_t+;
+//#pragma link C++ class std::pair<double,double>+;
+//#pragma link C++ class imutil::Coordinate_t+;
 #pragma link C++ class imutil::Contour_t+;
 #pragma link C++ class imutil::ContourArray_t+;
 #pragma link C++ class imutil::ContourTreeMaker+;
