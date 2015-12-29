@@ -11,6 +11,13 @@
 
 #pragma link C++ class larlite::Image+;
 #pragma link C++ class larlite::checkInside+;
+
+#pragma link C++ namespace imutil+;
+#pragma link C++ class imutil::Coordinate_t+;
+#pragma link C++ class imutil::Contour_t+;
+#pragma link C++ class imutil::ContourArray_t+;
+#pragma link C++ class imutil::ContourTreeMaker+;
+
 //ADD_NEW_CLASS ... do not change this line
 #endif
 
