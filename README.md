@@ -17,9 +17,9 @@ mac/runcheckInside.py : Make tree that stores hits in branches according to the 
 To run:
 (this is ridiculous right now; needs to change before will become useful):
 
-> python runImage.py reco2dfile.root  --> output file "out.root"
-> python storeContours.py out.root    --> output file "contours.root"
-> python runcheckInside.py            --> output file "hit\_tree.root"
+> python runImage.py reco2dfile.root     --> output file "out.root"
+> python storeContours.py out.root       --> output file "contours.root"
+> python runcheckInside.py contours.root --> output file "hit\_tree.root"
 
 So now, I suggest the hits are merged (in order to test the truth value of that statement, need to run fully through shower reco).  Have not figured out best way to incorporate this into matching framework, and perhaps should not continue along this path at all. Current idea is to convert each group of 'clustered' hits into cluster\_params objects.  If can do this, can pass the output root file to matchign algorithms and see what pops out.
 
