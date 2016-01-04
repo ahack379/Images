@@ -29,7 +29,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    checkInside(){ _name="checkInside"; _fout=0;}
+    checkInside(){ _name="checkInside"; _fout=0; _file=0; _contour_tree=0; _hit_tree=0; _contour_array=0;}
 
     /// Default destructor
     virtual ~checkInside(){}
@@ -46,13 +46,18 @@ namespace larlite {
     /// Calcualte the angle between hit and 2 sets of coordinates
     double Angle2D(double& x1, double& y1, double& x2, double& y2);
 
+    void newTree(const int & event, const int & plane);
+
   protected:
 
-    std::vector<std::pair<double,double>> contours ;
+    TFile * _file ;
+    TTree * _contour_tree ;
+    TTree * _hit_tree ;
 
-    std::vector<larlite::hit> _hits; 
+    int _event ; 
 
-    std::vector<std::vector<larlite::hit>> _clusters ;
+    std::vector<std::vector<std::pair<double,double>>> * _contour_array;
+    std::vector<std::vector<std::pair<double,double>>> _hits; 
     
   };
 }

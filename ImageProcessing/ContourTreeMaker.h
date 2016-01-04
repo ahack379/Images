@@ -49,6 +49,9 @@ namespace imutil {
     /// TTree-fill method
     void Fill() { _tree.Fill(); }
 
+    /// TTree-write method
+    void Write() { _tree.Write(); }
+
     /// TTree getter
     const TTree& Tree() { return _tree; }
     
