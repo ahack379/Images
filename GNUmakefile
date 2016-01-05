@@ -30,21 +30,13 @@ SUBDIRS := ImageProcessing #ADD_NEW_SUBDIR ... do not remove this comment from t
 .phony: all clean
 
 all:
-<<<<<<< HEAD
 	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $(LARLITE_USERDEVDIR)/Images/$$i && $(MAKE) ) || exit $$?; done
-=======
-	@for i in $(SUBDIRS); do ( echo "" && echo "Compiling $$i..." && cd $(LARLITE_USERDEVDIR)/ImageProcessing/$$i && $(MAKE) ) || exit $$?; done
->>>>>>> 60e2c16114d06b5063b48cba8eebb0b149534eed
 #####################################################################################
 #
 # CLEANs...
 #
 clean:
-<<<<<<< HEAD
 	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $(LARLITE_USERDEVDIR)/Images/$$i && $(MAKE) clean && rm -f $(LARLITE_LIBDIR)/$$i.* ) || exit $$?; done
-=======
-	@for i in $(SUBDIRS); do ( echo "" && echo "Cleaning $$i..." && cd $(LARLITE_USERDEVDIR)/ImageProcessing/$$i && $(MAKE) clean && rm -f $(LARLITE_LIBDIR)/$$i.* ) || exit $$?; done
->>>>>>> 60e2c16114d06b5063b48cba8eebb0b149534eed
 
 #####################################################################################
 #
@@ -52,7 +44,6 @@ clean:
 #
 doxygen:
 	@echo 'dOxygenising your code...'
-<<<<<<< HEAD
 	@mkdir -p $(LARLITE_USERDEVDIR)/Images/doc/dOxygenMyProject
 	@doxygen $(LARLITE_USERDEVDIR)/Images/doc/doxygenMyProject.script
 
@@ -60,15 +51,6 @@ doxygen+:
 	@echo 'dOxygenising MyProject + local-ROOT...'
 	@mkdir -p $(LARLITE_USERDEVDIR)/Images/doc/dOxygenMyProject+
 	@doxygen $(LARLITE_USERDEVDIR)/Images/doc/doxygenMyProject+.script
-=======
-	@mkdir -p $(LARLITE_USERDEVDIR)/ImageProcessing/doc/dOxygenMyProject
-	@doxygen $(LARLITE_USERDEVDIR)/ImageProcessing/doc/doxygenMyProject.script
-
-doxygen+:
-	@echo 'dOxygenising MyProject + local-ROOT...'
-	@mkdir -p $(LARLITE_USERDEVDIR)/ImageProcessing/doc/dOxygenMyProject+
-	@doxygen $(LARLITE_USERDEVDIR)/ImageProcessing/doc/doxygenMyProject+.script
->>>>>>> 60e2c16114d06b5063b48cba8eebb0b149534eed
 #
 #####################################################################################
 #EOF
