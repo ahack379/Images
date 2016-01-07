@@ -47,11 +47,13 @@ namespace larlite {
     TTree * _event_tree;
     std::vector<double> _xmax ;
     std::vector<double> _xmin ;
-    std::vector<double> _ymax ;
+    std::vector<double> _ymax;
     std::vector<double> _ymin ;
+    std::vector<double> _qmax ;
 
     std::vector<std::vector<double>> _wires;
     std::vector<std::vector<double>> _times;
+    std::vector<std::vector<double>> _charge;
 
     int _nplanes ;
     

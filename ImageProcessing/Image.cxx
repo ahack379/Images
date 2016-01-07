@@ -16,8 +16,10 @@ namespace larlite {
     _event_tree->Branch("x_min","std::vector<double>",&_xmin);
     _event_tree->Branch("y_max","std::vector<double>",&_ymax);
     _event_tree->Branch("y_min","std::vector<double>",&_ymin);
+    _event_tree->Branch("q_max","std::vector<double>",&_qmax);
     _event_tree->Branch("wire_v","std::vector<std::vector<double>>",&_wires);
     _event_tree->Branch("time_v","std::vector<std::vector<double>>",&_times);
+    _event_tree->Branch("charge_v","std::vector<std::vector<double>>",&_charge);
   }
 
     return true;
@@ -30,22 +32,28 @@ namespace larlite {
     _ymax.resize(_nplanes);
     _ymin.resize(_nplanes);
 
+    _qmax.resize(_nplanes);
+
     for(size_t i=0; i < _nplanes ; i++){
       _xmax[i] = 0;
       _xmin[i] = 1e12;
       _ymax[i] = 0;
       _ymin[i] = 1e12;
+      _qmax[i] = 0;
       }
     
     _wires.clear();
     _times.clear();
+    _charge.clear();
     
     _wires.resize(_nplanes);
     _times.resize(_nplanes);
+    _charge.resize(_nplanes);
 
     for(size_t i=0; i < _nplanes; i++){
       _wires[i].clear();
       _times[i].clear();
+      _charge[i].clear();
        }
    }
   
@@ -71,6 +79,7 @@ namespace larlite {
     for(size_t k=0; k<_nplanes; k++){
       _wires[k].reserve(ev_hit->size()-1);
       _times[k].reserve(ev_hit->size()-1);
+      _charge[k].reserve(ev_hit->size()-1);
       }
 
 
@@ -81,6 +90,7 @@ namespace larlite {
 
         _wires[p].emplace_back(h.WireID().Wire); 
         _times[p].emplace_back(h.PeakTime()   ); 
+        _charge[p].emplace_back(h.Integral()   ); 
 
           if(_wires[p].back() > _xmax[p] )
             _xmax[p] = _wires[p].back();
@@ -91,6 +101,9 @@ namespace larlite {
             _ymax[p] = _times[p].back();
           if(_times[p].back() < _ymin[p] )
             _ymin[p] = _times[p].back();
+
+          if(_charge[p].back() > _qmax[p] )
+            _qmax[p] = _charge[p].back();
 
         }
       
