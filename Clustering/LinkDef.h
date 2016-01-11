@@ -10,10 +10,11 @@
 #pragma link off all functions;
 
 #pragma link C++ class larlite::ClusterHits+;
-#pragma link C++ class HitImageMaker+;
-#pragma link C++ class HitInside+;
+#pragma link C++ class ContourMaker+;
+#pragma link C++ class MatMaker+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

@@ -16,8 +16,7 @@
 #define LARLITE_CLUSTERHITS_H
 
 #include "Analysis/ana_base.h"
-#include "HitImageMaker.h"
-#include "HitInside.h"
+#include "ContourMaker.h"
 
 namespace larlite {
   /**
@@ -42,8 +41,8 @@ namespace larlite {
 
   protected:
 
-    HitImageMaker _ImageMaker;
-    HitInside     _InsideCheck;
+    ContourMaker _ConMaker;
+//    HitInside     _InsideCheck;
     int           _nplanes;
 
   };

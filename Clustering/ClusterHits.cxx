@@ -21,9 +21,9 @@ namespace larlite {
     AssSet_t my_ass;
 
     // Returns all planes of all contours in the plane of interest
-    auto const & contours = _ImageMaker.GetClusters(ev_hit);
+    auto const & contours = _ConMaker.GetContours(ev_hit);
 
-    int offset = _ImageMaker.GetOffset();
+    int offset = _ConMaker.GetOffset();
 
     for(int plane=0; plane<contours.size(); plane++){
 
@@ -48,12 +48,12 @@ namespace larlite {
 
 	  if( h.WireID().Plane != plane) continue; // skip for hit that's not on this plane
           
-	  int wire = ( h.WireID().Wire - (_ImageMaker.GetWireMin(plane) - offset) )/_ImageMaker.GetDivWire(plane) ;
-          int time = ( h.PeakTime() - (_ImageMaker.GetTimeMin(plane) - offset) )/_ImageMaker.GetDivTime(plane);
+	  int wire = ( h.WireID().Wire - (_ConMaker.GetWireMin(plane) - offset) )/_ConMaker.GetDivWire(plane) ;
+          int time = ( h.PeakTime() - (_ConMaker.GetTimeMin(plane) - offset) )/_ConMaker.GetDivTime(plane);
 
           std::pair<int,int> point ( time, wire ) ;
 
-	  if (! _InsideCheck.InContour(c, point, 10) ) continue;
+	  if (! _ConMaker.InContour(c, point, 10) ) continue;
 
           // At this point we've found at least 1 hit inside this contour!
           // Create a cluster to store association info for this contour
