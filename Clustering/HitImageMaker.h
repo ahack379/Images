@@ -45,30 +45,28 @@
 
     size_t NumContours(const size_t plane) const;
 
-    int GetWireMax(int plane) { return x_max_v[plane] ; }
+    float GetWireMax(int plane) { return x_max_v[plane] ; }
 
-    int GetWireMin(int plane) { return x_min_v[plane] ; }
+    float GetWireMin(int plane) { return x_min_v[plane] ; }
 
-    int GetTimeMax(int plane) { return y_max_v[plane] ; }
+    float GetTimeMax(int plane) { return y_max_v[plane] ; }
 
-    int GetTimeMin(int plane) { return y_min_v[plane] ; }
+    float GetTimeMin(int plane) { return y_min_v[plane] ; }
 
-    int GetDivWire(int plane) {return _div_x[plane] ; }
+    float GetDivWire(int plane) {return _div_x[plane] ; }
 
-    int GetDivTime(int plane) {return _div_y[plane] ; }
+    float GetDivTime(int plane) {return _div_y[plane] ; }
 
     int GetBins() { return _n_bins; }
 
     int GetOffset() { return _offset; }
 
-    void SetWTMaxMin( float w_max, float w_min, float t_max, float t_min, float q_max, int plane ) { 
-        x_max_v[plane] = w_max ; 
-	x_min_v[plane] = w_min ; 
-	y_max_v[plane] = t_max ; 
-	y_min_v[plane] = t_min ; 
-	q_max_v[plane] = q_max ;
-      }
+    // Pass Canny edges for 1 plane and found contours in that plane 
+    void DrawTestPlane( ::cv::Mat canny, std::vector<std::vector<::cv::Point>> ) ;
 
+    void ResetVectors() ;
+
+    void GetMaxMinWTQ(const ::larlite::event_hit * hits ) ;
 
   protected:
 
@@ -83,8 +81,8 @@
     int _kernel;
     int _n_bins;
     int _offset;
-    std::vector<int> _div_x;
-    std::vector<int> _div_y;
+    std::vector<float> _div_x;
+    std::vector<float> _div_y;
 
     std::vector<float> x_max_v ;
     std::vector<float> x_min_v ;

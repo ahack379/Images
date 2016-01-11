@@ -35,8 +35,8 @@ public:
 
    /// Is this hit in the contour?
    ///int InContour(std::vector<std::pair<double,double>> & contour, const ::larlite::hit & h) ;
-   int InContour(std::vector<std::pair<int,int>> contour, std::pair<double,double> point) ;
-   int InContour(larcv::Point2DArray contour, std::pair<float,float> point) ;
+   int InContour(std::vector<std::pair<int,int>> contour, std::pair<double,double> point, int n_steps) ;
+   int InContour(larcv::Point2DArray contour, std::pair<float,float> point, int n_steps) ;
     
    /// Calcualte the angle between hit and 2 sets of coordinates
    double Angle2D(double& x1, double& y1, double& x2, double& y2);

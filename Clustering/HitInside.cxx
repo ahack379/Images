@@ -4,49 +4,50 @@
 #include "HitInside.h"
 #include "math.h"
 
- int HitInside::InContour(std::vector<std::pair<int,int>> points, std::pair<double,double> p)
+ int HitInside::InContour(std::vector<std::pair<int,int>> points, std::pair<double,double> p, int n_steps)
   {
      double angle=0;
      double x1, y1, x2, y2; 
      double pi = atan(1)*4 ;
 
-     for (size_t i = 0 ; i < points.size() ; i+=10) {
+     if (points.size() < n_steps) n_steps = 1;
+
+     for (size_t i = 0 ; i < points.size()-n_steps ; i+=n_steps) {
         x1 = points[i].first  - p.first;
         y1 = points[i].second - p.second;
-        x2 = points[(i+10)].first - p.first;
-        y2 = points[(i+10)].second - p.second;
+        x2 = points[(i+n_steps)].first - p.first;
+        y2 = points[(i+n_steps)].second - p.second;
         angle += Angle2D(x1,y1,x2,y2);
      }   
 
 //       std::cout<<"angle is: "<<angle<<std::endl ;
 
-   if (fabs(angle) < 1.1*pi) 
+   if (fabs(angle) < pi) 
       return false;
    else
       return true;
    }   
 
- int HitInside::InContour(larcv::Point2DArray arr, std::pair<float,float> p)
+ int HitInside::InContour(larcv::Point2DArray arr, std::pair<float,float> p, int n_steps)
   {
      double angle=0;
      double x1, y1, x2, y2; 
      double pi = atan(1)*4 ;
 
-//    std::cout<<"Size of contour : "<<arr.size()<<std::endl ;
-    
-     for (size_t i = 0 ; i < arr.size()-10 ; i+=10) {
+     if (arr.size() < n_steps) n_steps = 1;
+
+     for (size_t i = 0 ; i < arr.size()-n_steps ; i+=n_steps) {
         x1 = arr.point(i).x - p.first;
         y1 = arr.point(i).y - p.second;
-        x2 = arr.point(i+10).x - p.first;
-        y2 = arr.point(i+10).y - p.second;
+        x2 = arr.point(i+n_steps).x - p.first;
+        y2 = arr.point(i+n_steps).y - p.second;
         angle += Angle2D(x1,y1,x2,y2);
-//        std::cout<<"x1, x2, y1, y2 : "<<x1<<", "<<x2<<", "<<y1<<", "<<y2 <<std::endl; 
      }   
 
-//     if( angle > 0.00001*pi )
-  //     std::cout<<"angle is: "<<angle<<std::endl ;
+// if( angle > 0.8*pi )
+//       std::cout<<"angle is: "<<angle<<std::endl ;
 
-   if (fabs(angle) < 0.9*pi) 
+   if (fabs(angle) < 0.5*pi) 
       return false;
    else
       return true;

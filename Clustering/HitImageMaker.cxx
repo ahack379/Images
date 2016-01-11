@@ -18,45 +18,33 @@
     }
 
   std::vector<std::vector<larcv::Point2DArray>> HitImageMaker::GetClusters(const ::larlite::event_hit * ev_hit) {
+  
+    ResetVectors();
 
-    _mat_v.clear();
-    _canny_v.clear();
-    _contour_v.clear();
+    GetMaxMinWTQ(ev_hit);
     
-    x_min_v.clear();
-    x_max_v.clear();
-    y_min_v.clear();
-    y_max_v.clear();
-    q_max_v.clear();
-
-    _div_x.clear();
-    _div_y.clear();
-
-
-    std::vector<float> q_max_v;
-    for(auto const& h : *ev_hit) {
-
-      if(h.Integral()<5.) continue;
-      size_t hit_plane = h.WireID().Plane;
-      if(hit_plane >= x_min_v.size()) {
-
-	x_min_v.resize(hit_plane+1,4000);
-	x_max_v.resize(hit_plane+1,0);
-	y_min_v.resize(hit_plane+1,9600);
-	y_max_v.resize(hit_plane+1,0);
-	q_max_v.resize(hit_plane+1,0);
-      }
-
-      float wire = h.WireID().Wire;
-      float time = h.PeakTime();
-      float  q = h.Integral();
-      if( x_min_v[hit_plane] > wire ) x_min_v[hit_plane] = wire ;
-      if( x_max_v[hit_plane] < wire ) x_max_v[hit_plane] = wire ;
-      if( y_min_v[hit_plane] > time ) y_min_v[hit_plane] = time ;
-      if( y_max_v[hit_plane] < time ) y_max_v[hit_plane] = time ;
-      if( q_max_v[hit_plane] < q    ) q_max_v[hit_plane] = q;
-    }
-
+//    for(auto const& h : *ev_hit) {
+//
+//      if(h.Integral()<5.) continue;
+//      size_t hit_plane = h.WireID().Plane;
+//      if(hit_plane >= x_min_v.size()) {
+//
+//	x_min_v.resize(hit_plane+1,4000);
+//	x_max_v.resize(hit_plane+1,0);
+//	y_min_v.resize(hit_plane+1,9600);
+//	y_max_v.resize(hit_plane+1,0);
+//	q_max_v.resize(hit_plane+1,0);
+//      }
+//
+//      float wire = h.WireID().Wire;
+//      float time = h.PeakTime();
+//      float  q = h.Integral();
+//      if( x_min_v[hit_plane] > wire ) x_min_v[hit_plane] = wire ;
+//      if( x_max_v[hit_plane] < wire ) x_max_v[hit_plane] = wire ;
+//      if( y_min_v[hit_plane] > time ) y_min_v[hit_plane] = time ;
+//      if( y_max_v[hit_plane] < time ) y_max_v[hit_plane] = time ;
+//      if( q_max_v[hit_plane] < q    ) q_max_v[hit_plane] = q;
+//    }
 
     //Resize for the correct number of planes
     _div_x.resize(x_max_v.size());
@@ -80,8 +68,6 @@
     for(auto const& h : *ev_hit) {
 
       if(h.Integral()<5.) continue;
-//      int wire = h.WireID().Wire;
-//     int time = (int)(h.PeakTime());
       size_t plane = h.WireID().Plane;
       int wire = (h.WireID().Wire - (x_min_v[plane] - _offset))/_div_x[plane];
       int time = ((int)(h.PeakTime()) - (y_min_v[plane] - _offset))/_div_y[plane];
@@ -96,10 +82,9 @@
 
     for(size_t plane=0; plane<_mat_v.size(); plane++) {
 
-//      std::cout<<"Blur canny: "<<_blur<<", "<<_canny_lower<<", "<<_canny_upper<<std::endl ;
+      // std::cout<<"Blur canny: "<<_blur<<", "<<_canny_lower<<", "<<_canny_upper<<std::endl ;
       ::cv::blur( _mat_v[plane], _mat_v[plane], ::cv::Size(_blur,_blur) );
-//      ::cv::Canny(_mat_v[plane],_canny_v[plane],_canny_lower,_canny_upper,_kernel);
-      ::cv::Canny(_mat_v[plane],_canny_v[plane],0.1,0.2,_kernel);
+      ::cv::Canny(_mat_v[plane],_canny_v[plane],_canny_lower,_canny_upper,_kernel);
 
       //Contours per this plane
       std::vector<std::vector<cv::Point> > cv_contour_v;
@@ -124,7 +109,6 @@
         if(area <= 30) continue;
         n_clus++;
         found.push_back(cv_contour);
-        //std::cout<<"Area is: "<<area<<std::endl;
 
         larcv::Point2DArray points;
 	points.resize(cv_contour.size());
@@ -134,25 +118,72 @@
  
 	 _contour_v[plane].push_back(points); 
         }
-
-       // This block is to visually check on the contours being drawn. Still doesn't match python 
-       //::cv::RNG rng(12345);
-       //if (plane == 0){
-       //  ::cv::Mat drawing = ::cv::Mat::zeros( _canny_v[plane].size(), CV_8UC3 );
-       //  for( int i = 0; i< found.size(); i++ ){
-       //    ::cv::Scalar color = ::cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-       //    ::cv::drawContours( drawing, found, i, color) ;//, 2, 8, hierarchy, 0, Point() );
-       //   }
-       //char* source_window = "Source";
-       //::cv::imshow( source_window, drawing);
-       //::cv::waitKey(0);
-       // }
-
-      std::cout<<"Number of clus saved for plane : "<<found.size()<<std::endl;
+      //std::cout<<"Number of clus saved for plane : "<<found.size()<<std::endl;
+       
+       //DrawTestPlane( _canny_v[plane],found ) ;
       }
 
     return _contour_v;
   }
+
+  void HitImageMaker::GetMaxMinWTQ(const ::larlite::event_hit * ev_hit){
+    for(auto const& h : *ev_hit) {
+
+      if(h.Integral()<5.) continue;
+      size_t hit_plane = h.WireID().Plane;
+      if(hit_plane >= x_min_v.size()) {
+
+	x_min_v.resize(hit_plane+1,4000);
+	x_max_v.resize(hit_plane+1,0);
+	y_min_v.resize(hit_plane+1,9600);
+	y_max_v.resize(hit_plane+1,0);
+	q_max_v.resize(hit_plane+1,0);
+      }
+
+      float wire = h.WireID().Wire;
+      float time = h.PeakTime();
+      float  q = h.Integral();
+      if( x_min_v[hit_plane] > wire ) x_min_v[hit_plane] = wire ;
+      if( x_max_v[hit_plane] < wire ) x_max_v[hit_plane] = wire ;
+      if( y_min_v[hit_plane] > time ) y_min_v[hit_plane] = time ;
+      if( y_max_v[hit_plane] < time ) y_max_v[hit_plane] = time ;
+      if( q_max_v[hit_plane] < q    ) q_max_v[hit_plane] = q;
+    }
+  
+    }
+
+  void HitImageMaker::ResetVectors(){
+
+    _mat_v.clear();
+    _canny_v.clear();
+    _contour_v.clear();
+    
+    x_min_v.clear();
+    x_max_v.clear();
+    y_min_v.clear();
+    y_max_v.clear();
+    q_max_v.clear();
+
+    _div_x.clear();
+    _div_y.clear();
+    }
+
+
+  // Visually check on the contours being drawn. Still doesn't match python 
+  void HitImageMaker::DrawTestPlane(::cv::Mat canny, std::vector<std::vector<cv::Point>> found){
+
+       ::cv::RNG rng(12345);
+       ::cv::Mat drawing = ::cv::Mat::zeros( canny.size(), CV_8UC3 );
+
+       for( int i = 0; i< found.size(); i++ ){
+         ::cv::Scalar color = ::cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+         ::cv::drawContours( drawing, found, i, color) ;//, 2, 8, hierarchy, 0, Point() );
+
+         char* source_window = "Source";
+         ::cv::imshow( source_window, drawing);
+         ::cv::waitKey(0);
+        }
+    }
 
   size_t HitImageMaker::NumContours(const size_t plane) const
   {
