@@ -136,17 +136,17 @@
         }
 
        // This block is to visually check on the contours being drawn. Still doesn't match python 
-       ::cv::RNG rng(12345);
-       if (plane == 0){
-         ::cv::Mat drawing = ::cv::Mat::zeros( _canny_v[plane].size(), CV_8UC3 );
-         for( int i = 0; i< found.size(); i++ ){
-           ::cv::Scalar color = ::cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-           ::cv::drawContours( drawing, found, i, color) ;//, 2, 8, hierarchy, 0, Point() );
-          }
-       char* source_window = "Source";
-       ::cv::imshow( source_window, drawing);
-       ::cv::waitKey(0);
-        }
+       //::cv::RNG rng(12345);
+       //if (plane == 0){
+       //  ::cv::Mat drawing = ::cv::Mat::zeros( _canny_v[plane].size(), CV_8UC3 );
+       //  for( int i = 0; i< found.size(); i++ ){
+       //    ::cv::Scalar color = ::cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+       //    ::cv::drawContours( drawing, found, i, color) ;//, 2, 8, hierarchy, 0, Point() );
+       //   }
+       //char* source_window = "Source";
+       //::cv::imshow( source_window, drawing);
+       //::cv::waitKey(0);
+       // }
 
       std::cout<<"Number of clus saved for plane : "<<found.size()<<std::endl;
       }
