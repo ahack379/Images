@@ -72,6 +72,9 @@ for entry in xrange(tree.GetEntries()):
 
             coordinate = contour_array[contour_index][coordinate_index]
 
+	    #This prints only 2 characters of the passed parameter.
+	    #If it had been "%4.2g", print would show 4 spaces, with only 2
+	    #characters of the passed parameter.
             print '(%.2g,%.2g)' % (coordinate.first,coordinate.second),
 
         # Insert a new line

@@ -89,7 +89,7 @@ for e in run:
       ax[i+3].imshow(canny_output,cmap=plt.cm.gray)
       ax[i].set_title('Plane %g ' % (i-3))
     else:
-      print "Plane: ", i
+      print "Plane: ", i, " number contours: ", len(contours) 
       for n, c in enumerate(contours):
           ar = c[:,0]
         

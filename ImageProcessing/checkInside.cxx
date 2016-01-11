@@ -8,7 +8,7 @@ namespace larlite {
 
   bool checkInside::initialize() { 
 
-    _file = TFile::Open("contours.root","READ");
+    _file = TFile::Open("cvContours.root","READ");
     _event = 0;
 
     return true; 
@@ -17,12 +17,15 @@ namespace larlite {
   void checkInside::newTree(const int & event, const int & plane ){
  
 //   _contour_array->clear();
+     
+//  std::cout<<"Contour array size: "<<_contour_array->size()<<std::endl ;
 
    _contour_tree = (TTree*)(_file->Get(Form("event_%i_plane_%i",event,plane)));
    _contour_tree->SetBranchAddress("contours",&_contour_array);
    _contour_tree->GetEntry(0);
 
-   //std::cout<<"event plane size: "<<event<<", "<<plane<<", "<<_contour_array->size()<<std::endl;
+  std::cout<<"\nTree name : "<<_contour_tree->GetName()<<std::endl ;
+  std::cout<<"Size: "<<_contour_array->size()<<std::endl;
 
    _hit_tree=new TTree(Form("hits_event_%d_plane_%d",event,plane), "Hit Tree");
    _hit_tree->Branch("hits","std::vector<std::vector<std::pair<double,double>>>",&_hits);
@@ -49,8 +52,9 @@ namespace larlite {
    for(int plane=0; plane<3; plane++){
      newTree(_event,plane);
      _hits.resize(_contour_array->size()) ;
-     for(size_t j=0; j<_contour_array->size(); j++ ){  
-
+     std::cout<<"Contour size, hits: "<<_contour_array->size()<<", "<<ev_hit->size()<<std::endl ;
+     for(int j=0; j<_contour_array->size(); j++ ){  
+        
        _hits[j].reserve(ev_hit->size());
        _contour_tree->GetEntry(j);
  
@@ -64,8 +68,8 @@ namespace larlite {
 	  else if (h.View() > plane)
 	    break;
            }
-         }
 	 _hit_tree->Fill();
+         }
 	if(_fout){
 	 _fout->cd();
          _hit_tree->Write();
@@ -83,10 +87,10 @@ namespace larlite {
      double x1, y1, x2, y2;
      double pi = atan(1)*4 ;
 
-     auto const & n = points.size()/2;
-     points.push_back(std::make_pair(points[0].first,points[0].second));
+//     auto const & n = points.size()/2;
+//     points.push_back(std::make_pair(points[0].first,points[0].second));
 
-     for (size_t i = 0 ; i < n ; i+=10) {
+     for (size_t i = 0 ; i < points.size() ; i+=10) {
         x1 = points[i].first  - p.first;
         y1 = points[i].second - p.second;
         x2 = points[(i+10)].first - p.first;
@@ -94,7 +98,7 @@ namespace larlite {
         angle += Angle2D(x1,y1,x2,y2);
      }   
 
-       std::cout<<"angle is: "<<angle<<std::endl ;
+//       std::cout<<"angle is: "<<angle<<std::endl ;
 
    if (fabs(angle) < 1.1*pi) 
       return false;
