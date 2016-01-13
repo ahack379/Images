@@ -43,6 +43,16 @@
        _kernel      = kernel;
       }
 
+    std::vector<double> GetAreas() { return _area_v ; }
+
+    std::vector<double> GetLengths() { return _length_v ; } 
+
+    std::vector<double> GetHeights() { return _height_v ; } 
+
+    std::vector<double> GetAspectRatio() { return _aspectRatio_v ; } 
+
+    std::vector<double> GetExtent() { return _extent_v; } 
+
     size_t NumContours(const size_t plane) ;
 
     bool InContour(std::vector<std::pair<int,int>> points, std::pair<double,double> p, int n_steps);
@@ -55,6 +65,12 @@
 
     //Per plane, vector of contours (which are the point2darrays)
     std::vector< std::vector<larcv::Point2DArray> >_contour_v;
+
+    std::vector<double> _area_v ;
+    std::vector<double> _length_v;
+    std::vector<double> _height_v;
+    std::vector<double> _aspectRatio_v ;
+    std::vector<double> _extent_v;
 
     int _blur;
     double _canny_upper;

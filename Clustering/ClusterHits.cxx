@@ -9,7 +9,18 @@
 
 namespace larlite {
 
-  bool ClusterHits::initialize() { return true; }
+  bool ClusterHits::initialize() { 
+    
+    if(!_area_tree){
+      _area_tree = new TTree("area_tree","Area");
+      _area_tree->Branch("area",&_area,"area/D");
+      _area_tree->Branch("length",&_length,"length/D");
+      _area_tree->Branch("height",&_height,"height/D");
+      _area_tree->Branch("aspect",&_aspect,"aspect/D");
+      _area_tree->Branch("extent",&_extent,"extent/D");
+      }
+  
+    return true; }
 
   bool ClusterHits::analyze(storage_manager* storage) {
     std::cout<<"\nIn analyze!! "<<std::endl ;
@@ -51,7 +62,7 @@ namespace larlite {
 	  int wire = ( h.WireID().Wire - (_ConMaker.GetWireMin(plane) - offset) )/_ConMaker.GetDivWire(plane) ;
           int time = ( h.PeakTime() - (_ConMaker.GetTimeMin(plane) - offset) )/_ConMaker.GetDivTime(plane);
 
-          std::pair<int,int> point ( time, wire ) ;
+          std::pair<int,int> point ( wire, time); //, wire ) ;
 
 	  if (! _ConMaker.InContour(c, point, 10) ) continue;
 
@@ -63,7 +74,7 @@ namespace larlite {
             cl.set_original_producer("imageCluster");
             cl.set_planeID(pID);
             cl.set_view(geo::View_t(plane));
-            cl.set_is_merged(true);
+            //cl.set_is_merged(true);
 
             out_cluster->emplace_back(cl);
 
@@ -95,17 +106,40 @@ namespace larlite {
     //
     // Now we have filled association
     // Example: loop over cluster of hits:
-    for(auto const& hit_index_v : my_ass) {
-      std::cout<<"hitv 1: "<<hit_index_v.size()<<std::endl ;
+//    for(auto const& hit_index_v : my_ass) {
+//      std::cout<<"hitv 1: "<<hit_index_v.size()<<std::endl ;
 //    for(auto const& hit_index : hit_index_v) {
 //        }
+//      }
+//
+    auto a = _ConMaker.GetAreas() ;
+    auto l = _ConMaker.GetLengths();
+    auto asp = _ConMaker.GetAspectRatio();
+    auto ex = _ConMaker.GetExtent();
+    auto h = _ConMaker.GetHeights();
+
+    for(size_t i=0; i<a.size(); i++){
+      _area = a[i] ;
+      _length = l[i] ;
+      _height= h[i] ;
+      _aspect = asp[i];
+      _extent = ex[i];
+
+      _area_tree->Fill();
       }
 
 
     return true;
   }
 
-  bool ClusterHits::finalize() { return true; }
+  bool ClusterHits::finalize() {
+  
+    if(_fout){
+     _fout->cd();
+     _area_tree->Write();
+      }
+
+    return true; }
 
 }
 #endif

@@ -28,7 +28,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ClusterHits(){ _name="ClusterHits"; _fout=0; }
+    ClusterHits(){ _name="ClusterHits"; _fout=0; _area_tree=0; }
 
     /// Default destructor
     virtual ~ClusterHits(){}
@@ -42,8 +42,15 @@ namespace larlite {
   protected:
 
     ContourMaker _ConMaker;
-//    HitInside     _InsideCheck;
     int           _nplanes;
+
+    TTree * _area_tree ;
+    double _area;
+    double _length;
+    double _height;
+    double _aspect;
+    double _extent;
+
 
   };
 }

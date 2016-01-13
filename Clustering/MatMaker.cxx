@@ -85,15 +85,18 @@ void MatMaker::DrawTestPlane(::cv::Mat canny, std::vector<std::vector<cv::Point>
 
   ::cv::RNG rng(12345);
   ::cv::Mat drawing = ::cv::Mat::zeros( canny.size(), CV_8UC3 );
+//  char* source_window = "Source";
+//  ::cv::imshow( "edges", canny);
+  //std::vector<::cv::Mat> allPlanes;
+  //allPlanes.reserve(found.size());
 
   for( int i = 0; i< found.size(); i++ ){
     ::cv::Scalar color = ::cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
     ::cv::drawContours( drawing, found, i, color) ;//, 2, 8, hierarchy, 0, Point() );
-
-    char* source_window = "Source";
-    ::cv::imshow( source_window, drawing);
-    ::cv::waitKey(0);
+    //allPlanes.emplace_back(drawing);
     }   
+    ::cv::imshow( "contours", drawing);
+    ::cv::waitKey(0);
   }   
 
 #endif

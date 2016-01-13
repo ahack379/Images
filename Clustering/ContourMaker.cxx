@@ -9,8 +9,8 @@
 
   ContourMaker::ContourMaker() { 
     _blur = 3 ;
-    _canny_lower = 5.;
-    _canny_upper = 10.;
+    _canny_lower = 5;
+    _canny_upper = 10;
     _kernel = 3;
     }
 
@@ -18,30 +18,46 @@
   
     Clear();
     _contour_v.clear();
+    _area_v.clear();
+    _length_v.clear();
+    _height_v.clear();
+    _aspectRatio_v.clear();
+    _extent_v.clear();
 
     FillMat(ev_hit);
     _contour_v.resize(GetMat().size());
 
     for(size_t plane=0; plane<GetMat().size(); plane++) {
 
+      //std::cout<<"Size is : "<< GetMat().size()<<", "<<GetMat()[plane].size()<<std::endl ;
+       
+      ::cv::Mat out;
+      ::cv::Mat cans;
 
-      std::cout<<"Size is : "<< GetMat().size()<<", "<<GetMat()[plane].size()<<std::endl ;
+      //::cv::imshow("Before",GetMat()[plane]);
+      //::cv::pyrDown(GetMat()[plane],GetMat()[plane],::cv::Size(2,2));
 
-      
+      //Previous blur/edge finder in use
+      //::cv::GaussianBlur( GetMat()[plane], out, ::cv::Size(_blur,_blur),3 );
+      //::cv::Canny( out,cans,_canny_lower,_canny_upper,_kernel);
 
-      ::cv::blur( GetMat()[plane], GetMat()[plane], ::cv::Size(_blur,_blur) );
-      ::cv::Canny( GetMat()[plane],GetCanny()[plane],_canny_lower,_canny_upper,_kernel);
-
-      //auto & mat_v = GetMat()[plane] ;
-      //auto & canny_v = GetCanny()[plane] ;
-
+      //The blur/edge finder in use
+      ::cv::blur( GetMat()[plane],out,::cv::Size(_blur,_blur) );
+      ::cv::threshold(out,cans,2,100,CV_THRESH_BINARY);
+      //::cv::imshow("After",cans);
       //Contours per this plane
       std::vector<std::vector<cv::Point> > cv_contour_v;
       std::vector<cv::Vec4i> cv_hierarchy_v;
  
-      ::cv::findContours(GetCanny()[plane],cv_contour_v,cv_hierarchy_v,
+      ::cv::findContours(cans,cv_contour_v,cv_hierarchy_v,
 			 CV_RETR_EXTERNAL,
 			 CV_CHAIN_APPROX_SIMPLE);
+
+      _area_v.reserve(_area_v.size() + cv_contour_v.size()) ;
+      _length_v.reserve(_length_v.size() + cv_contour_v.size()) ;
+      _height_v.reserve(_height_v.size() + cv_contour_v.size()) ;
+      _aspectRatio_v.reserve(_aspectRatio_v.size() + cv_contour_v.size()) ;
+      _extent_v.reserve(_extent_v.size() + cv_contour_v.size()) ;
 
       _contour_v[plane].reserve(cv_contour_v.size());
 
@@ -52,22 +68,42 @@
       for(size_t c_index=0; c_index<cv_contour_v.size(); ++c_index) {
 
 	auto& cv_contour  = cv_contour_v[c_index];
-	auto area = ::cv::contourArea(cv_contour);
+	auto area   = ::cv::contourArea(cv_contour);
 
         if(area <= 30) continue;
 
+	auto length = ::cv::arcLength(cv_contour,1);
+        auto rect = ::cv::boundingRect(cv_contour);
+	auto height = ( rect.height > rect.width ? rect.height : rect.width );
+//	auto ellipse = ::cv::fitEllipse(cv_contour);
+        double aspectR = double(rect.width)/rect.height;
+	double extent = double(area)/(rect.width*rect.height) ;
+	std::cout<<"Length and width : "<<rect.height<<", "<<rect.width<<std::endl ;
+
+//	for(auto & r : rect.x.size() ) {
+//	  std::cout<<"r.x,r.y : "<<rect.x[r]<<", "<<rect.y<<std::endl ;
+//	  }
+
+        //Find width of contour at mid-point
+
+        _area_v.push_back(area);
+	_length_v.push_back(length);
+        _height_v.push_back(height);
+        _aspectRatio_v.push_back(aspectR);
+	_extent_v.push_back(extent);
         larcv::Point2DArray points;
 	points.resize(cv_contour.size());
         found.push_back(cv_contour);
+        //std::cout<<"Area is: "<<area<<std::endl ;
 
 	for(size_t p_index=0; p_index<cv_contour.size(); ++p_index)
-	  points.set(p_index, cv_contour[p_index].x, cv_contour[p_index].y);
+	  points.set(p_index, cv_contour[p_index].y, cv_contour[p_index].x);
  
 	 _contour_v[plane].push_back(points); 
         }
 
       //std::cout<<"Number of clus saved for plane : "<<found.size()<<std::endl;
-       //DrawTestPlane( _canny_v[plane],found ) ;
+      //DrawTestPlane( cans,found ) ;
       }
 
     return _contour_v;
@@ -114,7 +150,7 @@
 // if( angle > 0.8*pi )
 //       std::cout<<"angle is: "<<angle<<std::endl ;
 
-     if (fabs(angle) < 0.5*pi)
+     if (fabs(angle) < 0.8*pi)
         return false;
      else
         return true;
