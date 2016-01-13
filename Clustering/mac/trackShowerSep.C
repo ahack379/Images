@@ -62,10 +62,11 @@ void trackShowerSep(){
     h5->Draw("same");
 
     TCanvas * c3 = new TCanvas("c3","c3");
-    TH1D * h6 = new TH1D("h6","Bounding Box Height Over Min Contour Width",40,0,120);
-    TH1D * h7 = new TH1D("h7","Aspect Ratios",40,0,120);
-    s->Draw("height/mindist>>h6"); //"npe_flash > 10 ");
-    t->Draw("height/mindist>>h7"); //"npe_flash > 10 ");
+    //TH1D * h6 = new TH1D("h6","Bounding Box Height Over Min Contour Width",60,0,70);
+    TH1D * h6 = new TH1D("h6","Max Contour Width Over Min Contour Width",60,0,70);
+    TH1D * h7 = new TH1D("h7","Aspect Ratios",60,0,70);
+    s->Draw("maxdist/mindist>>h6"); //"npe_flash > 10 ");
+    t->Draw("maxdist/mindist>>h7"); //"npe_flash > 10 ");
     h6->GetXaxis()->SetTitle("Length / Width");
     h6->SetFillColorAlpha(kBlue,0.35);
     h6->Scale(1./h6->GetEntries());
