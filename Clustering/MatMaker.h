@@ -33,7 +33,7 @@ public:
   /// Default destructor
   ~MatMaker(){}
 
-  void Clear();
+  void ClearMat();
 
   void FillMat(const ::larlite::event_hit * ev_hit );
 

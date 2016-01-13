@@ -11,53 +11,60 @@
     _blur = 3 ;
     _canny_lower = 5;
     _canny_upper = 10;
+    _threshold = 2;
     _kernel = 3;
     }
 
   std::vector<std::vector<larcv::Point2DArray>> ContourMaker::GetContours(const ::larlite::event_hit * ev_hit) {
   
-    Clear();
+    ClearMat();
     _contour_v.clear();
     _area_v.clear();
     _length_v.clear();
     _height_v.clear();
     _aspectRatio_v.clear();
     _extent_v.clear();
+    _min_v.clear();
+    _max_v.clear();
 
     FillMat(ev_hit);
     _contour_v.resize(GetMat().size());
 
     for(size_t plane=0; plane<GetMat().size(); plane++) {
 
-      //std::cout<<"Size is : "<< GetMat().size()<<", "<<GetMat()[plane].size()<<std::endl ;
-       
-      ::cv::Mat out;
-      ::cv::Mat cans;
+      ::cv::Mat blurred;
+      ::cv::Mat edges;
 
+      //KAZU UNCOMMENT THIS LINE TO VIEW SOME STUFF
       //::cv::imshow("Before",GetMat()[plane]);
-      //::cv::pyrDown(GetMat()[plane],GetMat()[plane],::cv::Size(2,2));
 
-      //Previous blur/edge finder in use
-      //::cv::GaussianBlur( GetMat()[plane], out, ::cv::Size(_blur,_blur),3 );
-      //::cv::Canny( out,cans,_canny_lower,_canny_upper,_kernel);
+      // Some other blur and edge finder options
+      //::cv::pyrDown(GetMat()[plane],GetMat()[plane],::cv::Size(2,2));
+      //::cv::GaussianBlur( GetMat()[plane], blurred, ::cv::Size(_blur,_blur),3 );
+      //::cv::Canny( blurred,edges,_canny_lower,_canny_upper,_kernel);
 
       //The blur/edge finder in use
-      ::cv::blur( GetMat()[plane],out,::cv::Size(_blur,_blur) );
-      ::cv::threshold(out,cans,2,100,CV_THRESH_BINARY);
-      //::cv::imshow("After",cans);
+      ::cv::blur( GetMat()[plane],blurred,::cv::Size(_blur,_blur) );
+      ::cv::threshold(blurred,edges,_threshold,100,CV_THRESH_BINARY);
+
+      //KAZU UNCOMMENT THIS LINE TO VIEW SOME STUFF
+      //::cv::imshow("After",edges);
+
       //Contours per this plane
       std::vector<std::vector<cv::Point> > cv_contour_v;
       std::vector<cv::Vec4i> cv_hierarchy_v;
  
-      ::cv::findContours(cans,cv_contour_v,cv_hierarchy_v,
+      ::cv::findContours(edges,cv_contour_v,cv_hierarchy_v,
 			 CV_RETR_EXTERNAL,
-			 CV_CHAIN_APPROX_SIMPLE);
+			 CV_CHAIN_APPROX_NONE);
 
       _area_v.reserve(_area_v.size() + cv_contour_v.size()) ;
       _length_v.reserve(_length_v.size() + cv_contour_v.size()) ;
       _height_v.reserve(_height_v.size() + cv_contour_v.size()) ;
       _aspectRatio_v.reserve(_aspectRatio_v.size() + cv_contour_v.size()) ;
       _extent_v.reserve(_extent_v.size() + cv_contour_v.size()) ;
+      _min_v.reserve(_min_v.size() + cv_contour_v.size()) ;
+      _max_v.reserve(_max_v.size() + cv_contour_v.size()) ;
 
       _contour_v[plane].reserve(cv_contour_v.size());
 
@@ -72,42 +79,92 @@
 
         if(area <= 30) continue;
 
+	 FillVariables(cv_contour);
+
+        larcv::Point2DArray points;
+	points.resize(cv_contour.size());
+        found.push_back(cv_contour);
+
+	for(size_t p_index=0; p_index<cv_contour.size(); ++p_index)
+	  points.set(p_index, cv_contour[p_index].y, cv_contour[p_index].x);
+ 
+	 _contour_v[plane].push_back(points); 
+ 
+        }
+      //KAZU UNCOMMENT THIS LINE TO VIEW
+      //DrawTestPlane( edges,found ) ;
+      }
+
+    return _contour_v;
+  }
+
+void ContourMaker::FillVariables(std::vector<::cv::Point> cv_contour){
+
+        // Fill the easy ones first
+	auto area   = ::cv::contourArea(cv_contour);
 	auto length = ::cv::arcLength(cv_contour,1);
         auto rect = ::cv::boundingRect(cv_contour);
 	auto height = ( rect.height > rect.width ? rect.height : rect.width );
-//	auto ellipse = ::cv::fitEllipse(cv_contour);
+	//auto ellipse = ::cv::fitEllipse(cv_contour);
         double aspectR = double(rect.width)/rect.height;
 	double extent = double(area)/(rect.width*rect.height) ;
-	std::cout<<"Length and width : "<<rect.height<<", "<<rect.width<<std::endl ;
-
-//	for(auto & r : rect.x.size() ) {
-//	  std::cout<<"r.x,r.y : "<<rect.x[r]<<", "<<rect.y<<std::endl ;
-//	  }
-
-        //Find width of contour at mid-point
 
         _area_v.push_back(area);
 	_length_v.push_back(length);
         _height_v.push_back(height);
         _aspectRatio_v.push_back(aspectR);
 	_extent_v.push_back(extent);
-        larcv::Point2DArray points;
-	points.resize(cv_contour.size());
-        found.push_back(cv_contour);
-        //std::cout<<"Area is: "<<area<<std::endl ;
 
-	for(size_t p_index=0; p_index<cv_contour.size(); ++p_index)
-	  points.set(p_index, cv_contour[p_index].y, cv_contour[p_index].x);
+        // Now fill the pain in the ass that prob won't work (max and min dist)
+	int con_length = cv_contour.size();
+	int k0(0);
+
+	double min_dist = 1e12;
+        double max_dist = -1 ; 
+
+	for(size_t k=0; k<con_length/2; k++ ){
+          double dist = sqrt( pow(cv_contour[k].x - cv_contour[k+con_length/2].x,2) 
+	                    + pow(cv_contour[k].y - cv_contour[k+con_length/2].y,2));
+
+	  if(dist < min_dist ){
+	    k0 = k;
+	    min_dist = dist ;
+	     }
+	   }
  
-	 _contour_v[plane].push_back(points); 
+	  _min_v.push_back(min_dist);
+
+	 // Now that we've found min dist, use the k0 to find max 
+	 for(size_t j=0; j <= k0+con_length/4 ; j++){
+           double dist = sqrt( pow(cv_contour[k0+j].x - cv_contour[k0+con_length/2-j].x,2) 
+	                     + pow(cv_contour[k0+j].y - cv_contour[k0+con_length/2-j].y,2));
+          
+	   if(dist > max_dist)
+	     max_dist = dist ;
+	   }
+
+	 for(int j=0; j <= k0+con_length/4 ; j++){
+           int idx = k0 - j;
+	   int idx_2 = con_length/2 + j;
+
+	   if( (k0 - j) < 0 )
+	     idx = con_length + (k0 - j);
+
+	    if( idx_2 >= con_length )
+	      idx_2 -= con_length ;
+
+           double dist = sqrt( pow(cv_contour[idx].x - cv_contour[idx_2].x,2) 
+	                     + pow(cv_contour[idx].y - cv_contour[idx_2].y,2));
+          
+	   if(dist > max_dist)
+	     max_dist = dist ;
+	   }
+
+	   _max_v.push_back(max_dist);
+
         }
 
-      //std::cout<<"Number of clus saved for plane : "<<found.size()<<std::endl;
-      //DrawTestPlane( cans,found ) ;
-      }
 
-    return _contour_v;
-  }
 
  bool ContourMaker::InContour(std::vector<std::pair<int,int>> points, std::pair<double,double> p, int n_steps)
   {

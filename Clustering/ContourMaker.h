@@ -53,6 +53,12 @@
 
     std::vector<double> GetExtent() { return _extent_v; } 
 
+    std::vector<double> GetMin() { return _min_v; } 
+
+    std::vector<double> GetMax() { return _max_v; } 
+
+    void FillVariables( std::vector<::cv::Point> contour );
+
     size_t NumContours(const size_t plane) ;
 
     bool InContour(std::vector<std::pair<int,int>> points, std::pair<double,double> p, int n_steps);
@@ -71,10 +77,14 @@
     std::vector<double> _height_v;
     std::vector<double> _aspectRatio_v ;
     std::vector<double> _extent_v;
+    std::vector<double> _min_v;
+    std::vector<double> _max_v;
+
 
     int _blur;
     double _canny_upper;
     double _canny_lower;
+    double _threshold;
     int _kernel;
 
 

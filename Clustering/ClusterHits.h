@@ -17,6 +17,9 @@
 
 #include "Analysis/ana_base.h"
 #include "ContourMaker.h"
+#include "ClusterRecoUtil/Base/CRUHelper.h"
+//#include "ClusterRecoUtil/Alg/FillGeomParams.h"
+#include "ClusterRecoUtil/Alg/DefaultParamsAlg.h"
 
 namespace larlite {
   /**
@@ -28,7 +31,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ClusterHits(){ _name="ClusterHits"; _fout=0; _area_tree=0; }
+    ClusterHits(){ _name="ClusterHits"; _fout=0; _area_tree=0; _dpa_tree=0;}
 
     /// Default destructor
     virtual ~ClusterHits(){}
@@ -39,9 +42,15 @@ namespace larlite {
 
     virtual bool finalize();
 
+//    void Clear();
+
   protected:
 
     ContourMaker _ConMaker;
+    ::cluster::CRUHelper    _CRUHelper;
+//    ::cluster::FillGeomParams _Filler;
+    ::cluster::DefaultParamsAlg _DPA;
+
     int           _nplanes;
 
     TTree * _area_tree ;
@@ -50,6 +59,15 @@ namespace larlite {
     double _height;
     double _aspect;
     double _extent;
+    double _mindist ;
+    double _maxdist;
+
+    TTree * _dpa_tree;
+    double _dpa_width ;
+    double _dpa_length;
+    double _sh ;
+    double _trk ;
+    double _open_angle ;
 
 
   };

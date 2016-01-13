@@ -5,7 +5,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 
-void MatMaker::Clear(){
+void MatMaker::ClearMat(){
 
   _mat_v.clear() ;
   _canny_v.clear();
@@ -80,7 +80,7 @@ void MatMaker::FillMat(const ::larlite::event_hit * ev_hit){
   }
 
 
-// Visually check on the contours being drawn. Still doesn't match python 
+// Visually check on the contours being drawn.
 void MatMaker::DrawTestPlane(::cv::Mat canny, std::vector<std::vector<cv::Point>> found){
 
   ::cv::RNG rng(12345);
@@ -92,7 +92,7 @@ void MatMaker::DrawTestPlane(::cv::Mat canny, std::vector<std::vector<cv::Point>
 
   for( int i = 0; i< found.size(); i++ ){
     ::cv::Scalar color = ::cv::Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-    ::cv::drawContours( drawing, found, i, color) ;//, 2, 8, hierarchy, 0, Point() );
+    ::cv::drawContours( drawing, found, i, color) ;
     //allPlanes.emplace_back(drawing);
     }   
     ::cv::imshow( "contours", drawing);
