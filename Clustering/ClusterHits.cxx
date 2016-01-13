@@ -33,7 +33,7 @@ namespace larlite {
     return true; }
 
   bool ClusterHits::analyze(storage_manager* storage) {
-    std::cout<<"\nIn analyze!! "<<std::endl ;
+//    std::cout<<"\nIn analyze!! "<<std::endl ;
     
     auto const ev_hit = storage->get_data<event_hit>("gaushit");
     auto out_cluster = storage->get_data<event_cluster>("imageCluster");

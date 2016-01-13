@@ -135,15 +135,16 @@ void ContourMaker::FillVariables(std::vector<::cv::Point> cv_contour){
 	  _min_v.push_back(min_dist);
 
 	 // Now that we've found min dist, use the k0 to find max 
-	 for(size_t j=0; j <= k0+con_length/4 ; j++){
+	 for(size_t j=0; j <= con_length/4 ; j++){
            double dist = sqrt( pow(cv_contour[k0+j].x - cv_contour[k0+con_length/2-j].x,2) 
 	                     + pow(cv_contour[k0+j].y - cv_contour[k0+con_length/2-j].y,2));
           
+	    //std::cout<<"1) Length and indices: "<<con_length<<", "<<k0+j<<", "<<k0+con_length/2-j<<", "<<dist<<std::endl; 
 	   if(dist > max_dist)
 	     max_dist = dist ;
 	   }
 
-	 for(int j=0; j <= k0+con_length/4 ; j++){
+	 for(int j=0; j <= con_length/4 ; j++){
            int idx = k0 - j;
 	   int idx_2 = con_length/2 + j;
 
@@ -155,12 +156,15 @@ void ContourMaker::FillVariables(std::vector<::cv::Point> cv_contour){
 
            double dist = sqrt( pow(cv_contour[idx].x - cv_contour[idx_2].x,2) 
 	                     + pow(cv_contour[idx].y - cv_contour[idx_2].y,2));
+	 //   std::cout<<"2) Length and indices: "<<con_length<<", "<<idx<<", "<<idx_2<<std::endl; 
           
 	   if(dist > max_dist)
 	     max_dist = dist ;
 	   }
 
 	   _max_v.push_back(max_dist);
+
+	  // std::cout<<"Max dist is : "<<max_dist<<std::endl ;
 
         }
 
