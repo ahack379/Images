@@ -63,7 +63,7 @@
 
     bool InContour(std::vector<std::pair<int,int>> points, std::pair<double,double> p, int n_steps);
 
-    bool InContour(larcv::Point2DArray arr, std::pair<float,float> p, int n_steps);
+    bool InContour(larcv::Point2DArray arr, std::pair<float,float> p, int n_steps,float scale);
 
     double Angle2D(double & x1, double & y1, double & x2, double & y2) ;
 

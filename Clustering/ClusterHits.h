@@ -31,7 +31,7 @@ namespace larlite {
   public:
 
     /// Default constructor
-    ClusterHits(){ _name="ClusterHits"; _fout=0; _area_tree=0; _dpa_tree=0;}
+    ClusterHits(){ _name="ClusterHits"; _fout=0; _area_tree=0; _dpa_tree=0;}//  _scale = 0;}
 
     /// Default destructor
     virtual ~ClusterHits(){}
@@ -51,7 +51,9 @@ namespace larlite {
 //    ::cluster::FillGeomParams _Filler;
     ::cluster::DefaultParamsAlg _DPA;
 
-    int           _nplanes;
+    int _nplanes;
+    int _nsteps;
+    float _scale;
 
     TTree * _area_tree ;
     double _area;
@@ -61,6 +63,8 @@ namespace larlite {
     double _extent;
     double _mindist ;
     double _maxdist;
+    double _hit_dens ;
+    double _n_hits;
 
     TTree * _dpa_tree;
     double _dpa_width ;

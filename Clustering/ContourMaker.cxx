@@ -48,7 +48,8 @@
       ::cv::threshold(blurred,edges,_threshold,100,CV_THRESH_BINARY);
 
       //KAZU UNCOMMENT THIS LINE TO VIEW SOME STUFF
-      //::cv::imshow("After",edges);
+      //::cv::imshow("Blurred",blurred);
+      //::cv::imshow("Threshold",edges);
 
       //Contours per this plane
       std::vector<std::vector<cv::Point> > cv_contour_v;
@@ -101,13 +102,14 @@
 void ContourMaker::FillVariables(std::vector<::cv::Point> cv_contour){
 
         // Fill the easy ones first
+        auto rect = ::cv::boundingRect(cv_contour);
+
 	auto area   = ::cv::contourArea(cv_contour);
 	auto length = ::cv::arcLength(cv_contour,1);
-        auto rect = ::cv::boundingRect(cv_contour);
 	auto height = ( rect.height > rect.width ? rect.height : rect.width );
-	//auto ellipse = ::cv::fitEllipse(cv_contour);
         double aspectR = double(rect.width)/rect.height;
 	double extent = double(area)/(rect.width*rect.height) ;
+	//auto ellipse = ::cv::fitEllipse(cv_contour);
 
         _area_v.push_back(area);
 	_length_v.push_back(length);
@@ -192,7 +194,7 @@ void ContourMaker::FillVariables(std::vector<::cv::Point> cv_contour){
       return true;
    }   
 
- bool ContourMaker::InContour(larcv::Point2DArray arr, std::pair<float,float> p, int n_steps)
+ bool ContourMaker::InContour(larcv::Point2DArray arr, std::pair<float,float> p, int n_steps, float scale)
   {
      double angle=0;
      double x1, y1, x2, y2; 
@@ -211,7 +213,7 @@ void ContourMaker::FillVariables(std::vector<::cv::Point> cv_contour){
 // if( angle > 0.8*pi )
 //       std::cout<<"angle is: "<<angle<<std::endl ;
 
-     if (fabs(angle) < 0.8*pi)
+     if (fabs(angle) < scale*pi)
         return false;
      else
         return true;

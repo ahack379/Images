@@ -10,6 +10,8 @@
 namespace larlite {
 
   bool ClusterHits::initialize() { 
+    _nsteps = 2;
+    _scale  = 1 ;
     
     if(!_area_tree){
       _area_tree = new TTree("area_tree","Area");
@@ -20,6 +22,8 @@ namespace larlite {
       _area_tree->Branch("extent",&_extent,"extent/D");
       _area_tree->Branch("mindist",&_mindist,"mindist/D");
       _area_tree->Branch("maxdist",&_maxdist,"maxdist/D");
+      _area_tree->Branch("hit_dens",&_hit_dens,"hit_dens/D");
+      _area_tree->Branch("n_hits",&_n_hits,"n_hits/D");
       }
      if(!_dpa_tree){
       _dpa_tree = new TTree("dpa_tree","Params");
@@ -41,12 +45,18 @@ namespace larlite {
 
     AssSet_t my_ass;
 
+
+//std::cout<<"Scale is: "<<_scale<<std::endl ;
     // Returns all planes of all contours in the plane of interest
     auto const & contours = _ConMaker.GetContours(ev_hit);
 
     int offset = _ConMaker.GetOffset();
+    std::vector<int> filled_contours ;
+    std::vector<int> hit_v;
 
     for(int plane=0; plane<contours.size(); plane++){
+      filled_contours.reserve(contours[plane].size() + filled_contours.size()) ;
+      hit_v.reserve(contours[plane].size() + filled_contours.size()); 
 
       geo::PlaneID pID(0,0,plane);
 
@@ -55,10 +65,12 @@ namespace larlite {
       my_ass.reserve(contours[plane].size() + ass_set_index_offset ); 
 
       std::map<size_t,larlite::hit> used_hits ;
+
       int temp_contour_index = 0;
 
       for(int contour_index=0; contour_index<contours[plane].size(); contour_index++){ 
 	  auto const& c = contours[plane][contour_index];
+	  int n_hits = 0;
 
         for(size_t hit_index=0; hit_index<ev_hit->size(); hit_index++) {
 
@@ -75,11 +87,14 @@ namespace larlite {
 
           std::pair<int,int> point ( wire, time); 
 
-	  if (! _ConMaker.InContour(c, point, 10) ) continue;
+	  if (! _ConMaker.InContour(c, point, _nsteps,_scale) ) continue;
 
           // At this point we've found at least 1 hit inside this contour!
           // Create a cluster to store association info for this contour
-          if( used_hits.size() == 0 || temp_contour_index != contour_index ){
+          if( used_hits.size() == 0 || (temp_contour_index != contour_index ) ){
+
+	    filled_contours.emplace_back(contour_index) ; 
+	    
             cluster cl;
             cl.set_id(out_cluster->size());
             cl.set_original_producer("imageCluster");
@@ -101,9 +116,15 @@ namespace larlite {
 
 	  auto& this_ass = my_ass[ out_cluster->size() - 1] ; 
 	  this_ass.push_back(hit_index);
+	  n_hits++;
+
         }
+	if(filled_contours.size() > hit_v.size())
+	  hit_v.emplace_back(n_hits);
+
       }
-    }
+
+    }// plane loop
 
     // Store association
     out_ass->set_association( out_cluster->id(), ev_hit->id(), my_ass );
@@ -112,7 +133,7 @@ namespace larlite {
 		    storage->subrun_id(),
 		    storage->event_id());
 
-    std::cout<<"asociation size: "<<my_ass.size()<<std::endl ;
+    //std::cout<<"asociation size: "<<my_ass.size()<<std::endl ;
 
     std::vector<::cluster::cluster_params> params_v;
     _CRUHelper.GenerateParams(storage, "imageCluster", params_v);
@@ -143,18 +164,25 @@ namespace larlite {
     auto min_dist = _ConMaker.GetMin();
     auto max_dist = _ConMaker.GetMax();
 
-    for(size_t i=0; i<a.size(); i++){
-      _area = a[i] ;
-      _length = l[i] ;
-      _height= h[i] ;
-      _aspect = asp[i];
-      _extent = ex[i];
-      _mindist= min_dist[i] ;
-      _maxdist= max_dist[i] ;
+  if ( _ConMaker.GetAreas().size() != hit_v.size() )
+   std::cout<<"Size of area: "<<_ConMaker.GetAreas().size()<<", "<<hit_v.size()<<std::endl ;
+
+    //for(size_t k=0; k<a.size(); k++){
+    for(size_t k=0; k<hit_v.size(); k++){
+      _area = a[k] ;
+      _hit_dens = hit_v[k] / a[k] ;
+      _length = l[k] ;
+      _height= h[k] ;
+      _aspect = asp[k];
+      _extent = ex[k];
+      _mindist= min_dist[k] ;
+      _maxdist= max_dist[k] ;
+      _n_hits = hit_v[k];
+
+//      std::cout<<"Filled contour index vs k : "<<k <<", "<<filled_contours[k]<<std::endl ;
 
       _area_tree->Fill();
       }
-
 
     return true;
   }
