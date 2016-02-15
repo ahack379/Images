@@ -28,7 +28,7 @@ class MatMaker{
 public:
 
   /// Default constructor
-  MatMaker(){ _n_bins = 200 ; _offset = 50; }
+  MatMaker(){ _n_bins = 150 ; _offset = 1; }
 
   /// Default destructor
   ~MatMaker(){}

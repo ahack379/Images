@@ -59,7 +59,7 @@ for e in run:
 
   fig, ((ax5,ax4,ax3),(ax5E,ax4E,ax3E),(ax2,ax1,ax0)) = plt.subplots(nrows=3,ncols=3) 
 #  fig, (ax2, ax1, ax0) = plt.subplots(nrows=1,ncols=3) 
-  src = cv2.imread('pi0.png')
+  #src = cv2.imread('pi0.png')
 
   ax.append(ax0)
   ax.append(ax1)
@@ -71,22 +71,32 @@ for e in run:
   ax.append(ax4E)
   ax.append(ax5E)
 
-  thresh = 5 
+  thresh = 2 
 
   for i in xrange(6):
 
     im = getImage(e,i,N_bins)
     im = np.uint8(im) 
 
+#    im = cv2.Mat(im)
+#    grey = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+
 #    cvtColor needs 3 or 4 dimensions to function properly
 #    blur = cv2.pyrDown(im,(2*len(im),2*len(im[0])))
     blur = cv2.blur( im, (3,3))
-    canny_output = cv2.Canny( blur, thresh, 2*thresh, 3 )
+#    blur = cv2.GaussianBlur(im,ksize=(5,5),sigmaX=5)
+    #blur = cv2.boxFilter(im,-1,ksize=(3,3))
+    _, canny_output = cv2.threshold(blur,thresh,100,cv2.THRESH_BINARY)
+
+#    print t
+
+ #   canny_output = cv2.Canny( blur, thresh, 2*thresh, 3 )
     _, contours, hier = cv2.findContours(canny_output, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
 
     if i > 2:  
       ax[i].imshow(im) #, cmap=plt.cm.winter)
-      ax[i+3].imshow(canny_output,cmap=plt.cm.gray)
+      ax[i+3].imshow(blur,cmap=plt.cm.gray)
       ax[i].set_title('Plane %g ' % (i-3))
     else:
       print "Plane: ", i, " number contours: ", len(contours) 
@@ -97,7 +107,7 @@ for e in run:
           temp_y = ar[:len(ar),1]
 
           area = cv2.contourArea(c)
-          if area > 30 :
+          if area > 5 :
             print "Area is: ", area
             ax[i].plot(temp_x, temp_y,linewidth= 2)
 	    ax[i].axis([0,200,200,0]) 

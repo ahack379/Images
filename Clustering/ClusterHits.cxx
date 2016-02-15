@@ -18,8 +18,9 @@ namespace larlite {
       _area_tree->Branch("area",&_area,"area/D");
       _area_tree->Branch("length",&_length,"length/D");
       _area_tree->Branch("height",&_height,"height/D");
-      _area_tree->Branch("aspect",&_aspect,"aspect/D");
-      _area_tree->Branch("extent",&_extent,"extent/D");
+      _area_tree->Branch("width",&_width,"width/D");
+      _area_tree->Branch("max_width",&_max_width,"max_width/D");
+      _area_tree->Branch("min_width",&_min_width,"min_width/D");
       _area_tree->Branch("mindist",&_mindist,"mindist/D");
       _area_tree->Branch("maxdist",&_maxdist,"maxdist/D");
       _area_tree->Branch("hit_dens",&_hit_dens,"hit_dens/D");
@@ -158,25 +159,27 @@ namespace larlite {
 
     auto a = _ConMaker.GetAreas() ;
     auto l = _ConMaker.GetLengths();
-    auto asp = _ConMaker.GetAspectRatio();
-    auto ex = _ConMaker.GetExtent();
+    auto min_w = _ConMaker.GetMinWidths();
+    auto max_w = _ConMaker.GetMaxWidths();
     auto h = _ConMaker.GetHeights();
-    auto min_dist = _ConMaker.GetMin();
-    auto max_dist = _ConMaker.GetMax();
+    auto w = _ConMaker.GetWidths();
+    auto min_width = _ConMaker.GetMin();
+    auto max_width = _ConMaker.GetMax();
 
-  if ( _ConMaker.GetAreas().size() != hit_v.size() )
-   std::cout<<"Size of area: "<<_ConMaker.GetAreas().size()<<", "<<hit_v.size()<<std::endl ;
+//  if ( _ConMaker.GetAreas().size() != hit_v.size() )
+//   std::cout<<"Size of area: "<<_ConMaker.GetAreas().size()<<", "<<hit_v.size()<<std::endl ;
 
-    //for(size_t k=0; k<a.size(); k++){
-    for(size_t k=0; k<hit_v.size(); k++){
+    for(size_t k=0; k<a.size(); k++){
+    //for(size_t k=0; k<hit_v.size(); k++){
       _area = a[k] ;
       _hit_dens = hit_v[k] / a[k] ;
       _length = l[k] ;
       _height= h[k] ;
-      _aspect = asp[k];
-      _extent = ex[k];
-      _mindist= min_dist[k] ;
-      _maxdist= max_dist[k] ;
+      _width= w[k] ;
+      _max_width = max_w[k];
+      _min_width = min_w[k];
+      _mindist= min_width[k] ;
+      _maxdist= max_width[k] ;
       _n_hits = hit_v[k];
 
 //      std::cout<<"Filled contour index vs k : "<<k <<", "<<filled_contours[k]<<std::endl ;

@@ -49,19 +49,25 @@
 
     std::vector<double> GetHeights() { return _height_v ; } 
 
-    std::vector<double> GetAspectRatio() { return _aspectRatio_v ; } 
+    std::vector<double> GetWidths() { return _width_v ; } 
 
-    std::vector<double> GetExtent() { return _extent_v; } 
+    std::vector<double> GetMaxWidths() { return _maxWidth_v ; } 
+
+    std::vector<double> GetMinWidths() { return _minWidth_v; } 
 
     std::vector<double> GetMin() { return _min_v; } 
 
     std::vector<double> GetMax() { return _max_v; } 
+
+    bool DrawImShows( bool doityouwont ) { return _doityouwont; }
 
     void FillVariables( std::vector<::cv::Point> contour );
 
     size_t NumContours(const size_t plane) ;
 
     bool InContour(std::vector<std::pair<int,int>> points, std::pair<double,double> p, int n_steps);
+
+    bool InContour(std::vector<::cv::Point> points, std::pair<double,double> p, int n_steps);
 
     bool InContour(larcv::Point2DArray arr, std::pair<float,float> p, int n_steps,float scale);
 
@@ -75,8 +81,9 @@
     std::vector<double> _area_v ;
     std::vector<double> _length_v;
     std::vector<double> _height_v;
-    std::vector<double> _aspectRatio_v ;
-    std::vector<double> _extent_v;
+    std::vector<double> _width_v;
+    std::vector<double> _maxWidth_v ;
+    std::vector<double> _minWidth_v;
     std::vector<double> _min_v;
     std::vector<double> _max_v;
 
@@ -86,6 +93,8 @@
     double _canny_lower;
     double _threshold;
     int _kernel;
+
+    bool _doityouwont;
 
 
   };

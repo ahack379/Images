@@ -59,8 +59,9 @@ namespace larlite {
     double _area;
     double _length;
     double _height;
-    double _aspect;
-    double _extent;
+    double _width;
+    double _max_width;
+    double _min_width;
     double _mindist ;
     double _maxdist;
     double _hit_dens ;

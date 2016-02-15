@@ -18,6 +18,8 @@ INCFLAGS += -I/usr/local/include/
 #INCFLAGS += -I$(LARLITE_USERDEVDIR)/OpenCV
 INCFLAGS += -I$(LARLITE_USERDEVDIR)/Images
 
+CFLAGS += $(shell pkg-config --cflags)
+
 # platform-specific options
 OSNAME          = $(shell uname -s)
 HOST            = $(shell uname -n)
@@ -31,6 +33,7 @@ LDFLAGS += -L/usr/local/lib/ -lopencv_core -lopencv_highgui -lopencv_objdetect -
 LDFLAGS += -L$(LARLITE_LIBDIR) -lImages_ImageProcessing
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtil
 LDFLAGS += -L$(LARLITE_LIBDIR) -lRecoTool_ClusterRecoUtilAlg
+LDFLAGS += $(shell pkg-config --libs opencv)
 
 # call kernel specific compiler setup
 include $(LARLITE_BASEDIR)/Makefile/Makefile.${OSNAME}
